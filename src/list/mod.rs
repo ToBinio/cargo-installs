@@ -10,24 +10,36 @@ pub fn list() -> anyhow::Result<()> {
 }
 
 pub fn print_crates(crates: Vec<CrateData>) {
-    let name_length = crates.iter().map(|data| data.name.len()).max().unwrap();
-    let version_length = crates.iter().map(|data| data.version.len()).max().unwrap();
+    let name_length = crates
+        .iter()
+        .map(|data| data.name.len())
+        .max()
+        .unwrap()
+        .max("Name".len());
+    let newest_version_length = crates
+        .iter()
+        .map(|data| data.newest_version.len())
+        .max()
+        .unwrap()
+        .max("Newest".len());
+    let version_length = crates
+        .iter()
+        .map(|data| data.version.len())
+        .max()
+        .unwrap()
+        .max("Version".len());
 
     println!(
-        "{:name_length$} {:version_length$}",
+        "{:name_length$} {:version_length$} {:newest_version_length$}",
         "Name".bold(),
         "Version".bold(),
-        name_length = name_length,
-        version_length = version_length
+        "Newest".bold(),
     );
 
     for data in crates {
         println!(
-            "{:name_length$} {:version_length$}",
-            data.name,
-            data.version,
-            name_length = name_length,
-            version_length = version_length
+            "{:name_length$} {:version_length$} {:newest_version_length$}",
+            data.name, data.version, data.newest_version
         )
     }
 }

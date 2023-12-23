@@ -1,3 +1,4 @@
+use crate::util::sparse::get_highest_version;
 use anyhow::anyhow;
 use home::cargo_home;
 use serde::Deserialize;
@@ -21,6 +22,7 @@ pub fn installed() -> anyhow::Result<Vec<CrateData>> {
 pub struct CrateData {
     pub name: String,
     pub version: String,
+    pub newest_version: String,
     pub origen: String,
     pub version_req: Option<String>,
     pub bins: Vec<String>,
@@ -38,11 +40,14 @@ impl TryFrom<(String, RawCrateData)> for CrateData {
     fn try_from((name, data): (String, RawCrateData)) -> Result<Self, Self::Error> {
         let mut split = name.split(' ');
 
+        let name = split
+            .next()
+            .ok_or(anyhow!("could not parse name"))?
+            .to_string();
+
         Ok(CrateData {
-            name: split
-                .next()
-                .ok_or(anyhow!("could not parse name"))?
-                .to_string(),
+            newest_version: get_highest_version(&name)?,
+            name,
             version: split
                 .next()
                 .ok_or(anyhow!("could not parse name"))?
