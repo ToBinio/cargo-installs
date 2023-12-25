@@ -7,7 +7,9 @@ pub mod cli;
 pub mod list;
 pub mod update;
 
-fn main() {
+pub mod util;
+
+fn main() -> anyhow::Result<()> {
     let CargoCli::Installs(args) = CargoCli::parse();
 
     if let Some(commands) = args.command {
@@ -15,6 +17,8 @@ fn main() {
             Commands::Update => update(),
         }
     } else {
-        list()
+        list()?;
     }
+
+    Ok(())
 }
