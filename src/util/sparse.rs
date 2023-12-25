@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use crates_index::{Crate, SparseIndex, Version};
+use crates_index::{Crate, SparseIndex};
 
 fn update_index(name: &str) -> anyhow::Result<()> {
     let index = SparseIndex::new_cargo_default()?;
@@ -26,7 +26,6 @@ pub fn get_highest_version(name: &str) -> anyhow::Result<String> {
     Ok(krate
         .highest_normal_version()
         .map(|version| version.version().to_string())
-        //todo error message
-        .ok_or(anyhow!("no versions found"))?
+        .ok_or(anyhow!("could not find version for \"{}\" found", name))?
         .clone())
 }

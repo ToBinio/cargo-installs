@@ -4,7 +4,6 @@ use home::cargo_home;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::sync::mpsc::channel;
-use std::sync::Mutex;
 use std::{fs, thread};
 
 pub fn get_installed() -> anyhow::Result<Vec<CrateData>> {
@@ -20,16 +19,13 @@ pub fn get_installed() -> anyhow::Result<Vec<CrateData>> {
         let sender = sender.clone();
         thread::spawn(move || {
             let result = data.try_into();
-            sender.send(result).expect("TODO: panic message");
+            sender.send(result).expect("something went wrong");
         });
     }
 
     drop(sender);
 
-    Ok(receiver
-        .iter()
-        .filter_map(|data| data.ok())
-        .collect())
+    Ok(receiver.iter().filter_map(|data| data.ok()).collect())
 }
 
 #[derive(Debug)]
@@ -51,12 +47,12 @@ pub struct CrateData {
 impl TryFrom<(String, RawCrateData)> for CrateData {
     type Error = anyhow::Error;
 
-    fn try_from((name, data): (String, RawCrateData)) -> Result<Self, Self::Error> {
-        let mut split = name.split(' ');
+    fn try_from((full_name, data): (String, RawCrateData)) -> Result<Self, Self::Error> {
+        let mut split = full_name.split(' ');
 
         let name = split
             .next()
-            .ok_or(anyhow!("could not parse name"))?
+            .ok_or(anyhow!("could not parse name: \"{}\")", full_name))?
             .to_string();
 
         Ok(CrateData {
@@ -64,11 +60,11 @@ impl TryFrom<(String, RawCrateData)> for CrateData {
             name,
             version: split
                 .next()
-                .ok_or(anyhow!("could not parse name"))?
+                .ok_or(anyhow!("could not parse name: \"{}\")", full_name))?
                 .to_string(),
             origen: split
                 .next()
-                .ok_or(anyhow!("could not parse name"))?
+                .ok_or(anyhow!("could not parse name: \"{}\")", full_name))?
                 .to_string(),
             version_req: data.version_req,
             bins: data.bins,
