@@ -84,7 +84,6 @@ dependencies = [
  "crates-index",
  "home",
  "iter_tools",
- "semver",
  "serde",
  "serde_json",
  "ureq",
