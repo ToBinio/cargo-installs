@@ -32,7 +32,7 @@ pub fn get_installed() -> anyhow::Result<Vec<CrateData>> {
 pub struct CrateData {
     pub name: String,
     pub version: String,
-    pub newest_version: String,
+    pub latest_version: String,
     pub origen: String,
     pub version_req: Option<String>,
     pub bins: Vec<String>,
@@ -44,6 +44,11 @@ pub struct CrateData {
     pub rustc: String,
 }
 
+impl CrateData {
+    pub fn is_latest_version(&self) -> bool {
+        self.version == self.latest_version
+    }
+}
 impl TryFrom<(String, RawCrateData)> for CrateData {
     type Error = anyhow::Error;
 
@@ -56,7 +61,7 @@ impl TryFrom<(String, RawCrateData)> for CrateData {
             .to_string();
 
         Ok(CrateData {
-            newest_version: get_highest_version(&name)?,
+            latest_version: get_highest_version(&name)?,
             name,
             version: split
                 .next()

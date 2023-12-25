@@ -18,10 +18,10 @@ pub fn print_crates(crates: Vec<CrateData>) {
         .max("Name".len());
     let newest_version_length = crates
         .iter()
-        .map(|data| data.newest_version.len())
+        .map(|data| data.latest_version.len())
         .max()
         .unwrap()
-        .max("Newest".len());
+        .max("Latest".len());
     let version_length = crates
         .iter()
         .map(|data| data.version.len())
@@ -33,13 +33,19 @@ pub fn print_crates(crates: Vec<CrateData>) {
         "{:name_length$} {:version_length$} {:newest_version_length$}",
         "Name".bold(),
         "Version".bold(),
-        "Newest".bold(),
+        "Latest".bold(),
     );
 
     for data in crates {
+        let latest_version = if data.is_latest_version() {
+            data.latest_version.normal()
+        } else {
+            data.latest_version.red()
+        };
+
         println!(
             "{:name_length$} {:version_length$} {:newest_version_length$}",
-            data.name, data.version, data.newest_version
+            data.name, data.version, latest_version
         )
     }
 }
