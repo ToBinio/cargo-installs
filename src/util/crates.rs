@@ -3,22 +3,36 @@ use anyhow::anyhow;
 use home::cargo_home;
 use serde::Deserialize;
 use std::collections::HashMap;
-use std::fs;
+use std::sync::mpsc::channel;
+use std::sync::Mutex;
+use std::{fs, thread};
 
-pub fn installed() -> anyhow::Result<Vec<CrateData>> {
+pub fn get_installed() -> anyhow::Result<Vec<CrateData>> {
     let path = cargo_home()?.join(".crates2.json");
 
     let file = fs::read_to_string(path)?;
 
     let parse: RawCrates = serde_json::from_str(&file)?;
 
-    Ok(parse
-        .installs
-        .into_iter()
-        .filter_map(|data| data.try_into().ok())
+    let (sender, receiver) = channel::<Result<CrateData, anyhow::Error>>();
+
+    for data in parse.installs {
+        let sender = sender.clone();
+        thread::spawn(move || {
+            let result = data.try_into();
+            sender.send(result).expect("TODO: panic message");
+        });
+    }
+
+    drop(sender);
+
+    Ok(receiver
+        .iter()
+        .filter_map(|data| data.ok())
         .collect())
 }
 
+#[derive(Debug)]
 pub struct CrateData {
     pub name: String,
     pub version: String,

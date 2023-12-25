@@ -1,8 +1,8 @@
-use crate::util::crates::{installed, CrateData};
+use crate::util::crates::{get_installed, CrateData};
 use colored::Colorize;
 
 pub fn list() -> anyhow::Result<()> {
-    let crates = installed()?;
+    let crates = get_installed()?;
 
     print_crates(crates);
 
