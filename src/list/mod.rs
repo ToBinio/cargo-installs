@@ -1,4 +1,6 @@
+use crate::util;
 use crate::util::crates::{get_installed, CrateData};
+use crate::util::table::get_column_width;
 use colored::Colorize;
 use iter_tools::Itertools;
 
@@ -11,24 +13,10 @@ pub fn list() -> anyhow::Result<()> {
 }
 
 pub fn print_crates(crates: Vec<CrateData>) {
-    let name_length = crates
-        .iter()
-        .map(|data| data.name.len())
-        .max()
-        .unwrap()
-        .max("Name".len());
-    let newest_version_length = crates
-        .iter()
-        .map(|data| data.latest_version.len())
-        .max()
-        .unwrap()
-        .max("Latest".len());
-    let version_length = crates
-        .iter()
-        .map(|data| data.version.len())
-        .max()
-        .unwrap()
-        .max("Version".len());
+    let name_length = get_column_width("Name", &crates, |data| data.name.len());
+    let version_length = get_column_width("Version", &crates, |data| data.version.len());
+    let newest_version_length =
+        get_column_width("Latest", &crates, |data| data.latest_version.len());
 
     println!(
         "{:name_length$} {:version_length$} {:newest_version_length$}",
