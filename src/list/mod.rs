@@ -1,4 +1,3 @@
-use crate::util;
 use crate::util::crates::{get_installed, CrateData};
 use crate::util::table::get_column_width;
 use colored::Colorize;

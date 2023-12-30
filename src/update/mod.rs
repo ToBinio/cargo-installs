@@ -2,8 +2,7 @@ use crate::util::crates::{get_installed, CrateData};
 use crate::util::table::get_column_width;
 use colored::{ColoredString, Colorize};
 use fancy_duration::AsFancyDuration;
-use std::fmt::Debug;
-use std::process::{Command, Stdio};
+use std::process::Command;
 use std::time::{Duration, Instant};
 
 pub fn update() -> anyhow::Result<()> {
@@ -48,10 +47,10 @@ struct InstallResult {
 }
 
 fn print_results(results: &Vec<InstallResult>) {
-    let name_length = get_column_width("Name", &results, |data| data.name.len());
-    let prev_version_length = get_column_width("Before", &results, |data| data.prev_version.len());
-    let new_version_length = get_column_width("Now", &results, |data| data.new_version.len());
-    let time_length = get_column_width("Time", &results, |data| {
+    let name_length = get_column_width("Name", results, |data| data.name.len());
+    let prev_version_length = get_column_width("Before", results, |data| data.prev_version.len());
+    let new_version_length = get_column_width("Now", results, |data| data.new_version.len());
+    let time_length = get_column_width("Time", results, |data| {
         data.time.fancy_duration().format_compact().len()
     });
 
