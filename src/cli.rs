@@ -24,5 +24,7 @@ pub enum Commands {
 pub struct BlacklistArgs {
     #[arg(short, long)]
     pub remove: bool,
+    #[arg(short, long)]
+    pub list: bool,
     pub crates: Vec<String>,
 }
