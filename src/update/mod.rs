@@ -1,4 +1,5 @@
 use crate::util::crates::{get_installed, CrateData};
+use crate::util::settings::settings;
 use crate::util::table::get_column_width;
 use colored::{ColoredString, Colorize};
 use fancy_duration::AsFancyDuration;
@@ -6,6 +7,8 @@ use std::process::Command;
 use std::time::{Duration, Instant};
 
 pub fn update() -> anyhow::Result<()> {
+    let settings = settings()?;
+
     let crates: Vec<CrateData> = get_installed()?
         .into_iter()
         .filter(|data| !data.is_latest_version())
@@ -14,6 +17,17 @@ pub fn update() -> anyhow::Result<()> {
     let mut installs = vec![];
 
     for data in crates {
+        if settings.blacklist.contains(&data.name) {
+            installs.push(InstallResult {
+                name: data.name.to_string(),
+                prev_version: data.version,
+                new_version: "blacklisted".normal(),
+                time: "-".to_string(),
+            });
+
+            continue;
+        }
+
         let now = Instant::now();
 
         let mut child = Command::new("cargo")
@@ -31,7 +45,7 @@ pub fn update() -> anyhow::Result<()> {
             } else {
                 "failed".red()
             },
-            time: now.elapsed(),
+            time: now.elapsed().fancy_duration().format(),
         })
     }
 
@@ -43,16 +57,14 @@ struct InstallResult {
     name: String,
     prev_version: String,
     new_version: ColoredString,
-    time: Duration,
+    time: String,
 }
 
 fn print_results(results: &Vec<InstallResult>) {
     let name_length = get_column_width("Name", results, |data| data.name.len());
     let prev_version_length = get_column_width("Before", results, |data| data.prev_version.len());
     let new_version_length = get_column_width("Now", results, |data| data.new_version.len());
-    let time_length = get_column_width("Time", results, |data| {
-        data.time.fancy_duration().format_compact().len()
-    });
+    let time_length = get_column_width("Time", results, |data| data.time.len());
 
     println!(
         "{:name_length$} {:prev_version_length$} {:new_version_length$} {:time_length$}",
@@ -69,7 +81,7 @@ fn print_results(results: &Vec<InstallResult>) {
             result.prev_version,
             result.new_version,
             //todo
-            result.time.fancy_duration().format()
+            result.time
         )
     }
 }
