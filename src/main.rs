@@ -14,7 +14,7 @@ fn main() -> anyhow::Result<()> {
 
     if let Some(commands) = args.command {
         match commands {
-            Commands::Update => update(),
+            Commands::Update => update()?,
         }
     } else {
         list()?;
