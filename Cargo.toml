@@ -10,7 +10,7 @@ anyhow = "1.0.75"
 clap = { version = "4.4.11", features = ["derive"] }
 colored = "2.1.0"
 crates-index = "2.3.0"
-fancy-duration = "0.7.1"
+fancy-duration = "0.9.0"
 home = "0.5.9"
 iter_tools = "0.4.0"
 serde = { version = "1.0.193", features = ["derive"] }

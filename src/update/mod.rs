@@ -45,7 +45,7 @@ pub fn update() -> anyhow::Result<()> {
             } else {
                 "failed".red()
             },
-            time: now.elapsed().fancy_duration().format(),
+            time: now.elapsed().fancy_duration().truncate(2).format(),
         })
     }
 
