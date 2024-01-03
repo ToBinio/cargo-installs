@@ -96,6 +96,7 @@ dependencies = [
  "iter_tools",
  "serde",
  "serde_json",
+ "toml",
  "ureq",
 ]
 

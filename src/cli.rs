@@ -17,4 +17,14 @@ pub struct InstallsArgs {
 #[derive(Subcommand)]
 pub enum Commands {
     Update,
+    Blacklist(BlacklistArgs),
+}
+
+#[derive(clap::Args)]
+pub struct BlacklistArgs {
+    #[arg(short, long)]
+    pub remove: bool,
+    #[arg(short, long)]
+    pub list: bool,
+    pub crates: Vec<String>,
 }
