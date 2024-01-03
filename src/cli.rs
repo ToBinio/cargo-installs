@@ -16,6 +16,7 @@ pub struct InstallsArgs {
 
 #[derive(Subcommand)]
 pub enum Commands {
+    #[clap(alias = "u")]
     Update,
     Blacklist(BlacklistArgs),
 }
