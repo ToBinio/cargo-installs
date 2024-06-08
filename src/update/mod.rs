@@ -1,15 +1,12 @@
 use crate::util::crates::{get_installed, CrateData, Origen};
-use crate::util::settings::settings;
 use crate::util::table::get_column_width;
+use color_eyre::eyre;
 use colored::{ColoredString, Colorize};
 use fancy_duration::AsFancyDuration;
 use std::process::Command;
 use std::time::Instant;
-use color_eyre::eyre;
 
 pub fn update() -> eyre::Result<()> {
-    let settings = settings()?;
-
     let crates: Vec<CrateData> = get_installed()?
         .into_iter()
         .filter(|data| !data.is_latest_version())
@@ -18,17 +15,6 @@ pub fn update() -> eyre::Result<()> {
     let mut installs = vec![];
 
     for data in crates {
-        if settings.blacklist.contains(&data.name) {
-            installs.push(InstallResult {
-                name: data.name.to_string(),
-                prev_version: data.version,
-                new_version: "blacklisted".normal(),
-                time: "-".to_string(),
-            });
-
-            continue;
-        }
-
         if let Origen::Local = data.origen {
             installs.push(InstallResult {
                 name: data.name.to_string(),

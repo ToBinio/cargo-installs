@@ -1,15 +1,13 @@
-use color_eyre::eyre;
 use crate::util::crates::Origen::{Local, Remote};
 use crate::util::crates::{get_installed, CrateData};
 use crate::util::table::get_column_width;
+use color_eyre::eyre;
 use colored::{ColoredString, Colorize};
 use iter_tools::Itertools;
 
 pub fn list() -> eyre::Result<()> {
     let crates = get_installed()?;
-
     print_crates(crates);
-
     Ok(())
 }
 

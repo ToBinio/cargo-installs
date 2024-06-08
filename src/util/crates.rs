@@ -1,13 +1,17 @@
 use crate::util::crates::Origen::{Local, Remote};
+use crate::util::settings::settings;
 use crate::util::sparse::get_highest_version;
 use color_eyre::eyre;
 use color_eyre::eyre::eyre;
 use home::cargo_home;
 use serde::Deserialize;
 use std::collections::HashMap;
+use std::ops::Not;
 use std::{fs, thread};
 
 pub fn get_installed() -> eyre::Result<Vec<CrateData>> {
+    let settings = settings()?;
+
     let path = cargo_home()?.join(".crates.toml");
 
     let file = fs::read_to_string(path)?;
@@ -23,11 +27,13 @@ pub fn get_installed() -> eyre::Result<Vec<CrateData>> {
 
     let mut crates = Vec::with_capacity(handles.len());
     for handle in handles {
-        crates.push(
-            handle
-                .join()
-                .map_err(|_| eyre!("could not join threads"))??,
-        );
+        let data = handle
+            .join()
+            .map_err(|_| eyre!("could not join threads"))??;
+
+        if settings.blacklist.contains(&data.name).not() {
+            crates.push(data);
+        }
     }
 
     Ok(crates)
