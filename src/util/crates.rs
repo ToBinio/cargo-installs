@@ -1,9 +1,6 @@
 use crate::util::crates::Origen::{Local, Remote};
 use crate::util::sparse::get_highest_version;
 use anyhow::anyhow;
-use clap::builder::Str;
-use colored::Colorize;
-use crates_index::Names;
 use home::cargo_home;
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -18,9 +15,7 @@ pub fn get_installed() -> anyhow::Result<Vec<CrateData>> {
     let mut handles = vec![];
 
     for (text, _bins) in parse.v1 {
-        let handle = thread::spawn(move || {
-            return CrateData::from_definition(&text);
-        });
+        let handle = thread::spawn(move || CrateData::from_definition(&text));
 
         handles.push(handle);
     }

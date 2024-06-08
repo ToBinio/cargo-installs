@@ -11,14 +11,12 @@ pub fn black_list(mut blacklist_args: BlacklistArgs) -> anyhow::Result<()> {
         for name in &settings.blacklist {
             println!("{}", name);
         }
+    } else if blacklist_args.remove {
+        settings
+            .blacklist
+            .retain(|element| !blacklist_args.crates.contains(element))
     } else {
-        if blacklist_args.remove {
-            settings
-                .blacklist
-                .retain(|element| !blacklist_args.crates.contains(element))
-        } else {
-            settings.blacklist.append(&mut blacklist_args.crates);
-        }
+        settings.blacklist.append(&mut blacklist_args.crates);
     }
 
     save_settings(&settings)?;

@@ -1,5 +1,5 @@
 use crate::util::crates::Origen::{Local, Remote};
-use crate::util::crates::{get_installed, CrateData, Origen};
+use crate::util::crates::{get_installed, CrateData};
 use crate::util::table::get_column_width;
 use colored::{ColoredString, Colorize};
 use iter_tools::Itertools;

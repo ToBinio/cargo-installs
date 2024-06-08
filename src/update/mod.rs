@@ -4,7 +4,7 @@ use crate::util::table::get_column_width;
 use colored::{ColoredString, Colorize};
 use fancy_duration::AsFancyDuration;
 use std::process::Command;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 pub fn update() -> anyhow::Result<()> {
     let settings = settings()?;
