@@ -5,8 +5,9 @@ use colored::{ColoredString, Colorize};
 use fancy_duration::AsFancyDuration;
 use std::process::Command;
 use std::time::Instant;
+use color_eyre::eyre;
 
-pub fn update() -> anyhow::Result<()> {
+pub fn update() -> eyre::Result<()> {
     let settings = settings()?;
 
     let crates: Vec<CrateData> = get_installed()?

@@ -1,8 +1,9 @@
+use color_eyre::eyre;
 use home::cargo_home;
 use serde::{Deserialize, Serialize};
 use std::fs;
 
-pub fn settings() -> anyhow::Result<Settings> {
+pub fn settings() -> eyre::Result<Settings> {
     let path = cargo_home()?.join(".cargo-installs.toml");
 
     let settings: Settings = if let Ok(content) = fs::read_to_string(path) {
@@ -14,7 +15,7 @@ pub fn settings() -> anyhow::Result<Settings> {
     Ok(settings)
 }
 
-pub fn save_settings(settings: &Settings) -> anyhow::Result<()> {
+pub fn save_settings(settings: &Settings) -> eyre::Result<()> {
     let path = cargo_home()?.join(".cargo-installs.toml");
 
     fs::write(path, toml::to_string_pretty(settings)?)?;

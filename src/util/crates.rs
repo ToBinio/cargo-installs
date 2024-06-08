@@ -1,12 +1,13 @@
 use crate::util::crates::Origen::{Local, Remote};
 use crate::util::sparse::get_highest_version;
-use anyhow::anyhow;
+use color_eyre::eyre;
+use color_eyre::eyre::eyre;
 use home::cargo_home;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::{fs, thread};
 
-pub fn get_installed() -> anyhow::Result<Vec<CrateData>> {
+pub fn get_installed() -> eyre::Result<Vec<CrateData>> {
     let path = cargo_home()?.join(".crates.toml");
 
     let file = fs::read_to_string(path)?;
@@ -25,7 +26,7 @@ pub fn get_installed() -> anyhow::Result<Vec<CrateData>> {
         crates.push(
             handle
                 .join()
-                .map_err(|_| anyhow!("could not join threads"))??,
+                .map_err(|_| eyre!("could not join threads"))??,
         );
     }
 
@@ -47,20 +48,20 @@ impl CrateData {
         }
     }
 
-    pub fn from_definition(definition: &str) -> anyhow::Result<Self> {
+    pub fn from_definition(definition: &str) -> eyre::Result<Self> {
         let mut split = definition.split(' ');
 
         let name = split
             .next()
-            .ok_or(anyhow!("could not parse name: \"{}\")", definition))?
+            .ok_or(eyre!("could not parse name: \"{}\")", definition))?
             .to_string();
         let version = split
             .next()
-            .ok_or(anyhow!("could not parse version: \"{}\")", definition))?
+            .ok_or(eyre!("could not parse version: \"{}\")", definition))?
             .to_string();
         let origen = split
             .next()
-            .ok_or(anyhow!("could not parse origen: \"{}\")", definition))?
+            .ok_or(eyre!("could not parse origen: \"{}\")", definition))?
             .to_string();
         let origen = Origen::from_definition(&name, &origen)?;
 
@@ -79,7 +80,7 @@ pub enum Origen {
 }
 
 impl Origen {
-    pub fn from_definition(crate_name: &str, definition: &str) -> anyhow::Result<Self> {
+    pub fn from_definition(crate_name: &str, definition: &str) -> eyre::Result<Self> {
         if definition.starts_with("(path+") {
             Ok(Local)
         } else {
