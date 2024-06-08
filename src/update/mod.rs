@@ -1,10 +1,10 @@
-use crate::util::crates::{get_installed, CrateData};
+use crate::util::crates::{get_installed, CrateData, Origen};
 use crate::util::settings::settings;
 use crate::util::table::get_column_width;
 use colored::{ColoredString, Colorize};
 use fancy_duration::AsFancyDuration;
 use std::process::Command;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 pub fn update() -> anyhow::Result<()> {
     let settings = settings()?;
@@ -28,6 +28,17 @@ pub fn update() -> anyhow::Result<()> {
             continue;
         }
 
+        if let Origen::Local = data.origen {
+            installs.push(InstallResult {
+                name: data.name.to_string(),
+                prev_version: data.version,
+                new_version: "local".normal(),
+                time: "-".to_string(),
+            });
+
+            continue;
+        }
+
         let now = Instant::now();
 
         let mut child = Command::new("cargo")
@@ -37,14 +48,23 @@ pub fn update() -> anyhow::Result<()> {
 
         let status = child.wait()?;
 
+        let new_version = match data.origen {
+            Origen::Local => {
+                unreachable!()
+            }
+            Origen::Remote { latest_version } => {
+                if status.success() {
+                    latest_version.normal()
+                } else {
+                    "failed".red()
+                }
+            }
+        };
+
         installs.push(InstallResult {
             name: data.name.to_string(),
             prev_version: data.version,
-            new_version: if status.success() {
-                data.latest_version.normal()
-            } else {
-                "failed".red()
-            },
+            new_version,
             time: now.elapsed().fancy_duration().truncate(2).format(),
         })
     }
