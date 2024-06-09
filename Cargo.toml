@@ -9,11 +9,11 @@ edition = "2021"
 clap = { version = "4.4.11", features = ["derive"] }
 color-eyre = "0.6.3"
 colored = "2.1.0"
+console = "0.15.8"
 crates-index = "2.3.0"
 fancy-duration = "0.9.0"
 home = "0.5.9"
 iter_tools = "0.4.0"
 serde = { version = "1.0.193", features = ["derive"] }
-term = "0.7.0"
 toml = "0.8.8"
 ureq = { version = "2.9.1", features = ["http-interop"] }

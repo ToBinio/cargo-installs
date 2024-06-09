@@ -54,6 +54,13 @@ impl CrateData {
         }
     }
 
+    pub fn latest_version(&self) -> Option<String> {
+        match &self.origen {
+            Local => None,
+            Remote { latest_version } => Some(latest_version.to_string()),
+        }
+    }
+
     pub fn from_definition(definition: &str) -> eyre::Result<Self> {
         let mut split = definition.split(' ');
 
