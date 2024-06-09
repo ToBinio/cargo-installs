@@ -6,13 +6,17 @@ use console::Term;
 use fancy_duration::AsFancyDuration;
 use std::io::Write;
 use std::ops::Not;
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, Stdio};
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 use std::time::{Duration, Instant};
 
 pub fn update() -> eyre::Result<()> {
-    let crates: Vec<CrateData> = get_installed()?
+    let installed = get_installed()?;
+
+    let has_binstall = installed.iter().any(|data| data.name == "cargo-binstall");
+
+    let crates: Vec<CrateData> = installed
         .into_iter()
         .filter(|data| data.is_latest_version().not())
         .collect();
@@ -27,12 +31,7 @@ pub fn update() -> eyre::Result<()> {
     for data in crates {
         let now = Instant::now();
 
-        let mut child = Command::new("cargo")
-            .arg("install")
-            .arg(&data.name)
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()?;
+        let mut child = update_crate(&data, has_binstall)?;
 
         let thread_lock = term.clone();
         let (tx, rx) = mpsc::channel();
@@ -74,6 +73,23 @@ pub fn update() -> eyre::Result<()> {
     term.lock().unwrap().flush()?;
 
     Ok(())
+}
+
+fn update_crate(data: &CrateData, has_binstall: bool) -> eyre::Result<Child> {
+    let mut command = Command::new("cargo");
+
+    if has_binstall {
+        command.arg("binstall").arg(&data.name).arg("-y");
+    } else {
+        command.arg("install").arg(&data.name);
+    }
+
+    let child = command
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()?;
+
+    Ok(child)
 }
 
 /// returns the inset of where the time should begin to be rendered
