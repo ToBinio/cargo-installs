@@ -1,5 +1,6 @@
 use crate::util::crates::{get_installed, CrateData};
-use crate::util::table::get_column_width;
+use crate::util::visual::table::get_column_width;
+use crate::util::visual::version::mark_version_different;
 use color_eyre::eyre;
 use colored::Colorize;
 use console::Term;
@@ -115,13 +116,17 @@ fn print_start(crates: &Vec<CrateData>, term: &mut Term) -> eyre::Result<()> {
     )?;
 
     for data in crates {
+        let version_diff = mark_version_different(
+            &data.version,
+            &data
+                .latest_version()
+                .expect("local version never get updated"),
+        );
+
         writeln!(
             term,
             "{:name_length$} {:prev_version_length$} {:new_version_length$}",
-            data.name,
-            data.version,
-            data.latest_version()
-                .expect("local version never get updated"),
+            data.name, data.version, version_diff
         )?;
     }
 

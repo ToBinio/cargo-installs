@@ -1,6 +1,7 @@
 use crate::util::crates::Origen::{Local, Remote};
 use crate::util::crates::{get_installed, CrateData};
-use crate::util::table::get_column_width;
+use crate::util::visual::table::get_column_width;
+use crate::util::visual::version::mark_version_different;
 use color_eyre::eyre;
 use colored::{ColoredString, Colorize};
 use iter_tools::Itertools;
@@ -47,7 +48,7 @@ pub fn get_latest_version_text(crate_data: &CrateData) -> ColoredString {
             if crate_data.is_latest_version() {
                 latest_version.normal()
             } else {
-                latest_version.red()
+                mark_version_different(&crate_data.version, latest_version).normal()
             }
         }
     }

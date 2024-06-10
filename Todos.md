@@ -11,13 +11,10 @@
 
 ### Performance
 
-* user cargo-binstall when possible
 * add flag for multi threading updating
 
 ### Visuals
 
-* mark which part of a version changed
-* also show version change when updating
 * maybe only show latest version when different to current
 
 ### Long Term
@@ -28,3 +25,6 @@
 ---
 
 ## Fixes
+
+* update timer wrong position when resizing terminal
+* when update fails clear time
